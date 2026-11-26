@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  rutabol-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rutabol-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - SESSION_SECRET=rutabol_super_secret_session_key_2026
+      - CLIENT_URL=http://localhost
+    volumes:
+      - rutabol-data:/app/data
+      - rutabol-uploads:/app/uploads
+    networks:
+      - rutabol-network
+
+  rutabol-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rutabol-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "5173:80"
+    depends_on:
+      - rutabol-backend
+    networks:
+      - rutabol-network
+
+volumes:
+  rutabol-data:
+    name: rutabol-sqlite-data
+  rutabol-uploads:
+    name: rutabol-student-media
+
+networks:
+  rutabol-network:
+    driver: bridge
